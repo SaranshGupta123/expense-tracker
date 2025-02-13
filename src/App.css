@@ -1,0 +1,48 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.App{
+  width: 100%;
+  height: 100Vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.content{
+  min-height: calc(100vh - 140px);
+  width: 100%;
+}
+
+.boxes{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.box-expense , .box-receive{
+  border: 1px solid black;
+  height: 250px;
+  width: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 24px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin: 0 50px;
+  transition: all 0.3s ease; 
+}
+
+.box-expense:hover , .box-receive:hover{
+  padding: 65px;
+  font-size: 20px;
+  background-color: rgba(20, 116, 196, 0.548);
+}
