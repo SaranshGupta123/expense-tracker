@@ -40,9 +40,24 @@
   margin: 0 50px;
   transition: all 0.3s ease; 
 }
+.no-transactions{
+  border: 1px solid black;
+  height: 250px;
+  width: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 24px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin: 20px 0;
+}
 
 .box-expense:hover , .box-receive:hover{
-  padding: 65px;
+  height: 300px;
+  width: 300px;
+  padding: 90px;
   font-size: 20px;
   background-color: rgba(20, 116, 196, 0.548);
 }
