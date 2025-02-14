@@ -25,12 +25,10 @@ const Modal = ({
   };
   useEffect(() => {
     if (modalOpen) {
-      document.body.style.overflow = "hidden"; // Prevent scrolling
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "auto"; // Allow scrolling
+      document.body.style.overflow = "auto";
     }
-
-    // Cleanup function to reset overflow when the component unmounts
     return () => {
       document.body.style.overflow = "auto";
     };
