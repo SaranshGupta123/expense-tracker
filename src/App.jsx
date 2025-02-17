@@ -5,6 +5,7 @@ import { MdWorkHistory } from "react-icons/md";
 import React, { useState, useEffect } from "react";
 import uniqid from 'uniqid';
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
+import { RiDeleteBinLine } from "react-icons/ri";
 import "./App.css";
 
 function App() {
@@ -34,36 +35,54 @@ function App() {
   };
 
   const Expensehandler = (discription, amount) => {
+    if (typeof discription !== 'string' || isNaN(Number(amount))) {
+      alert("Invalid input. Description must be text and amount must be a number."); 
+      return;
+    }
     const newExpense = {
       id: uniqid(),
       type: "expense",
       amount: amount,
       discription: discription,
+      date: new Date(), 
     };
 
-    setexpenses((prevExpenses) => [...prevExpenses, newExpense]); 
+    setexpenses((prevExpenses) => [...prevExpenses, newExpense].sort((a, b) => new Date(b.date) - new Date(a.date)));
   };
 
   const receivehandler = (discription, amount) => {
+    if (typeof discription !== 'string' || isNaN(Number(amount))) {
+      alert("Invalid input. Description must be text and amount must be a number."); 
+      return; 
+    }
     const newReceive = {
       id: uniqid(),
       type: "receive",
       amount: amount,
       discription: discription,
+      date: new Date(),
     };
 
-    setreceives((prevReceives) => [...prevReceives, newReceive]); 
+    setreceives((prevReceives) => [...prevReceives, newReceive].sort((a, b) => new Date(b.date) - new Date(a.date))); 
   };
 
   const RemoveTransection = (type, id) => {
-    if (type === "expense") {
-      setexpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== id)); 
-    } else if (type === "receive") {
-      setreceives((prevReceives) => prevReceives.filter((receive) => receive.id !== id)); 
+    const confirmDelete = window.confirm("Are you sure you want to delete this transaction?");
+
+    if (confirmDelete) {
+      if (type === "expense") {
+        setexpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== id));
+      } else if (type === "receive") {
+        setreceives((prevReceives) => prevReceives.filter((receive) => receive.id !== id));
+      }
     }
   };
 
-  const transactions = [...expenses, ...receives];
+  const transactions = [...expenses, ...receives].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const formatDate = (date) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+  };
   console.log("Transactions", transactions);
   return (
     <>
@@ -89,7 +108,11 @@ function App() {
           <div className="transactions-body">
             
             {transactions.length > 0 ? (
-              <h1>All Transactions</h1>
+              <><h1>All Transactions</h1><div className="transaction-header">
+                <div className="transaction-header-item">Transaction Name</div>
+                <div className="transaction-header-item">Amount</div>
+                <div className="transaction-header-item">Date</div>
+              </div></>
             ) : (
               <div className="no-transactions">
                 <MdWorkHistory size={100} color="yellow" /> No Transactions{" "}
@@ -97,28 +120,37 @@ function App() {
             )}
             {transactions.map((transaction) => (
               <div
-                key={transaction.id}
-                style={{
-                  width: "60%",
-                  minHeight: "50px",
-                  padding: "10px",
-                  background: transaction.type === "expense" ? "red" : "green",
-                  display: "flex",
-                  alignItems: "center",
-                  marginTop: "20px",
-                  borderRadius: "10px",
-                  justifyContent: "space-between",
-                  fontSize: "24px",
+              key={transaction.id}
+              className="transaction-item"
+              style={{
+                width: "80%",
+                minHeight: "50px",
+                padding: "10px",
+                background: transaction.type === "expense" ? "red" : "green",
+                display: "flex",
+                alignItems: "center",
+                marginTop: "20px",
+                borderRadius: "10px",
+                justifyContent: "space-between",
+                fontSize: "24px",
+                position: "relative",
+              }}
+            >
+              <div>{transaction.discription}</div>
+              <div className="transaction-amount">{transaction.amount}</div>
+              <div className="transaction-date">{formatDate(transaction.date)}</div>
+              <RiDeleteBinLine
+                className="delete-icon" 
+                size={24}
+                color="white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  RemoveTransection(transaction.type, transaction.id);
                 }}
-                onClick={() =>
-                  RemoveTransection(transaction.type, transaction.id)
-                }
-              >
-                <div>{transaction.discription}</div>
-                <div>{transaction.amount}</div>
-              </div>
-            ))}
-          </div>
+              />
+            </div>
+          ))}
+        </div>
         </div>
         <Footer />
       </div>
