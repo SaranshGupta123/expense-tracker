@@ -1,42 +1,52 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import Modal from "./components/Modal";
 import { MdWorkHistory } from "react-icons/md";
 import React, { useState, useEffect } from "react";
 import uniqid from 'uniqid';
 import { GiPayMoney, GiReceiveMoney } from "react-icons/gi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import "./App.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Modal } from 'react-bootstrap'; 
 
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modaltype, setModalType] = useState("");
   const [expenses, setexpenses] = useState(
-    JSON.parse(localStorage.getItem("expenses")) || [] 
+    JSON.parse(localStorage.getItem("expenses")) || []
   );
   const [receives, setreceives] = useState(
-    JSON.parse(localStorage.getItem("receives")) || [] 
+    JSON.parse(localStorage.getItem("receives")) || []
   );
+  const [Discriptions, setDiscriptions] = useState("");
+  const [Amount, setAmount] = useState("");
+
 
   useEffect(() => {
     localStorage.setItem("expenses", JSON.stringify(expenses));
   }, [expenses]);
 
   useEffect(() => {
-    localStorage.setItem("receives", JSON.stringify(receives)); 
+    localStorage.setItem("receives", JSON.stringify(receives));
   }, [receives]);
-  const onExpenseClick = ()=>{
+
+  const onExpenseClick = () => {
     setModalOpen(true);
     setModalType("expense");
+    setDiscriptions(""); 
+    setAmount("");
   };
-  const onReceiveClick = ()=>{
+
+  const onReceiveClick = () => {
     setModalOpen(true);
     setModalType("receive");
+    setDiscriptions(""); 
+    setAmount("");
   };
 
   const Expensehandler = (discription, amount) => {
     if (typeof discription !== 'string' || isNaN(Number(amount))) {
-      alert("Invalid input. Description must be text and amount must be a number."); 
+      alert("Invalid input. Description must be text and amount must be a number.");
       return;
     }
     const newExpense = {
@@ -44,7 +54,7 @@ function App() {
       type: "expense",
       amount: amount,
       discription: discription,
-      date: new Date(), 
+      date: new Date(),
     };
 
     setexpenses((prevExpenses) => [...prevExpenses, newExpense].sort((a, b) => new Date(b.date) - new Date(a.date)));
@@ -52,8 +62,8 @@ function App() {
 
   const receivehandler = (discription, amount) => {
     if (typeof discription !== 'string' || isNaN(Number(amount))) {
-      alert("Invalid input. Description must be text and amount must be a number."); 
-      return; 
+      alert("Invalid input. Description must be text and amount must be a number.");
+      return;
     }
     const newReceive = {
       id: uniqid(),
@@ -63,7 +73,7 @@ function App() {
       date: new Date(),
     };
 
-    setreceives((prevReceives) => [...prevReceives, newReceive].sort((a, b) => new Date(b.date) - new Date(a.date))); 
+    setreceives((prevReceives) => [...prevReceives, newReceive].sort((a, b) => new Date(b.date) - new Date(a.date)));
   };
 
   const RemoveTransection = (type, id) => {
@@ -83,7 +93,23 @@ function App() {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
     return new Date(date).toLocaleDateString(undefined, options);
   };
-  console.log("Transactions", transactions);
+
+  const handleCloseModal = () => setModalOpen(false);
+  const handleSave = () => {
+    if (!Discriptions || !Amount) {
+      return;
+    }
+    if (modaltype === "expense") {
+      Expensehandler(Discriptions, Amount);
+    }
+    if (modaltype === "receive") {
+      receivehandler(Discriptions, Amount);
+    }
+    setModalOpen(false);
+    setDiscriptions("");
+    setAmount("");
+  };
+
   return (
     <>
       <div className="App">
@@ -152,6 +178,31 @@ function App() {
           ))}
         </div>
         </div>
+        <Modal show={modalOpen} onHide={handleCloseModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>{modaltype === "expense" ? "Add Expense" : "Add Receive"}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <input
+              type="text"
+              placeholder="Description"
+              value={Discriptions}
+              onChange={(e) => setDiscriptions(e.target.value)}
+              className="form-control mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Amount"
+              value={Amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="form-control"
+            />
+          </Modal.Body>
+          <Modal.Footer>
+            <button className="btn btn-secondary" onClick={handleCloseModal}>Close</button> {}
+            <button className="btn btn-primary" onClick={handleSave}>Save Changes</button> {}
+          </Modal.Footer>
+        </Modal>
         <Footer />
       </div>
     </>
